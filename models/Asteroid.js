@@ -7,14 +7,14 @@ export class Asteroid {
     height = null;
     color = null;
     angle = null;
-    angle_speed = null;
+    rotation_speed = null;
 
     constructor() {
         this.width = 50;
         this.height = 50;
         this.color = 'grey';
         this.angle = 0;
-        this.angle_speed = Math.random() * 2 + 2;
+        this.rotation_speed = Math.random() * 2 + 2;
 
         // We set the coordinates and the speed of the asteroid depending on 
         // the direction it comes from (0 = left, 1 = top, 2 = right, 3 = bottom)
@@ -73,7 +73,7 @@ export class Asteroid {
         context.drawImage(image, this.width / -2, this.height / -2, this.width, this.height);
 
         // Rotate asteroid image
-        this.angle += this.angle_speed;
+        this.angle += this.rotation_speed;
         
         context.restore();
     }
