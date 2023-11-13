@@ -1,4 +1,4 @@
-import { Game } from './Game.js';
+import { Game } from './models/Game.js';
 
 var game;
 
