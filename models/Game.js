@@ -1,5 +1,6 @@
 import { Player } from './Player.js';
 import { Asteroid } from './Asteroid.js';
+import { Star } from './Star.js';
 
 export class Game {
     canvas = null;
@@ -8,6 +9,7 @@ export class Game {
     interval = null;
     player = null;
     asteroids = [];
+    stars = [];
 
     pressedKeys = { 
         arrowUp: false, 
@@ -40,6 +42,11 @@ export class Game {
         for (let i = 0; i < 10; i++) {
             this.asteroids.push(new Asteroid());
         }
+        
+        // Generate 100 stars on random positions inside the canvas
+        for (let degrees = 0; degrees < 100; degrees++) {
+            this.stars.push(new Star());
+        }
 
         // Add event listener for arrow keys
         document.addEventListener('keydown', this.handleKeyDown);
@@ -54,6 +61,8 @@ export class Game {
     };
 
     update = () => {
+        this.frameNo++;
+
         this.clear();
         
         // Update player position
@@ -62,6 +71,9 @@ export class Game {
         // Update asetroids positions
         this.updateAsteroids();
         
+        // Update stars positions
+        this.updateStars();
+
         // Redraw game area
         this.draw();
 
@@ -103,7 +115,24 @@ export class Game {
         }
     };
 
+    updateStars = () => {
+        this.stars.forEach(star => star.update());
+
+        // Remove stars that are out of bounds
+        this.stars = this.stars.filter(star => {
+            return star.x > 0 && star.x < this.canvas.width && star.y > 0 && star.y < this.canvas.height;
+        });
+
+        // Add new stars every 10 frames
+        while (this.stars.length < 100) {
+            this.stars.push(new Star());
+        }
+    }
+
     draw = () => {
+        // Draw stars
+        this.stars.forEach(star => star.draw(this.context));
+        
         // Draw player
         this.player.draw(this.context);
         
