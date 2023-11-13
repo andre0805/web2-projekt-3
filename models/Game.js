@@ -24,7 +24,7 @@ export class Game {
         // Set canvas size to window size
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        
+
         // Add canvas to document
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 
@@ -34,7 +34,7 @@ export class Game {
 
     start = () => {
         // Init player
-        this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, 100, 100, 'red');
+        this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, 50, 50, 'red');
 
         // Generate 10 asteroids on random positions outside of the canvas (100px outside)
         for (let i = 0; i < 10; i++) {
@@ -74,6 +74,7 @@ export class Game {
     clear = () => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+
     updatePlayer = () => {
         // Apply movement if arrow key is pressed
         if (this.pressedKeys.arrowUp) this.player.moveUp();
@@ -93,11 +94,7 @@ export class Game {
 
         // Remove asteroids that are out of bounds
         this.asteroids = this.asteroids.filter(asteroid => {
-            if (asteroid.x < -100 || asteroid.x > this.canvas.width + 100 || asteroid.y < -100 || asteroid.y > this.canvas.height + 100) {
-                return false;
-            } else {
-                return true;
-            }
+            return asteroid.x > -100 && asteroid.x < this.canvas.width + 100 && asteroid.y > -100 && asteroid.y < this.canvas.height + 100;
         });
 
         // Add new asteroids if there are less than 10
@@ -118,7 +115,17 @@ export class Game {
         this.asteroids.forEach(asteroid => {
             if (this.checkCollision(this.player, asteroid)) {
                 this.asteroids = this.asteroids.filter(a => a !== asteroid);
-                // TODO: Play sound
+                
+                // Play explosion sound
+                const explosionAudio = document.getElementById('explosion_audio');
+                explosionAudio.play()
+                    .then(() => {
+                        explosionAudio.currentTime = 0;
+                    })
+                    .catch (error => {
+                        console.error(error);
+                    });
+
                 // TODO: Show explosion animation
             }
         });

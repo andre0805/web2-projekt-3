@@ -11,7 +11,7 @@ export class Player {
     constructor(x, y, width, height, color) {
         this.x = x;
         this.y = y;
-        this.speed = 10;
+        this.speed = 8;
         this.width = width;
         this.height = height;
         this.angle = 0;

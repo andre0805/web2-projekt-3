@@ -5,16 +5,16 @@ export class Asteroid {
     speed_y = null;
     width = null;
     height = null;
+    color = null;
     angle = null;
     angle_speed = null;
-    color = null;
 
     constructor() {
-        this.width = 100;
-        this.height = 100;
+        this.width = 50;
+        this.height = 50;
+        this.color = 'grey';
         this.angle = 0;
-        this.angle_speed = Math.random() * 3 + 3;
-        this.color = 'blue';
+        this.angle_speed = Math.random() * 2 + 2;
 
         // We set the coordinates and the speed of the asteroid depending on 
         // the direction it comes from (0 = left, 1 = top, 2 = right, 3 = bottom)
@@ -26,32 +26,32 @@ export class Asteroid {
             case 0:
                 this.x = -100;
                 this.y = Math.random() * (window.innerHeight);
-                this.speed_x = Math.random() * 10;
-                this.speed_y = (Math.random() * 5 + 5) * (this.y > window.innerHeight / 2 ? -1 : 1);
+                this.speed_x = Math.random() * 5;
+                this.speed_y = (Math.random() * 3 + 3) * (this.y > window.innerHeight / 2 ? -1 : 1);
                 break;
             
             // Asteroid comes from the top side
             case 1:
                 this.x = Math.random() * (window.innerWidth);
                 this.y = -100;
-                this.speed_x = (Math.random() * 5 + 5) * (this.x > window.innerWidth / 2 ? -1 : 1);
-                this.speed_y = Math.random() * 10;
+                this.speed_x = (Math.random() * 3 + 3) * (this.x > window.innerWidth / 2 ? -1 : 1);
+                this.speed_y = Math.random() * 5;
                 break;
             
             // Asteroid comes from the right side
             case 2:
                 this.x = window.innerWidth + 100;
                 this.y = Math.random() * (window.innerHeight);
-                this.speed_x = -Math.random() * 10;
-                this.speed_y = (Math.random() * 5 + 5) * (this.y > window.innerHeight / 2 ? -1 : 1);
+                this.speed_x = -Math.random() * 5;
+                this.speed_y = (Math.random() * 3 + 3) * (this.y > window.innerHeight / 2 ? -1 : 1);
                 break;
             
             // Asteroid comes from the bottom side
             case 3:
                 this.x = Math.random() * (window.innerWidth);
                 this.y = window.innerHeight + 100;
-                this.speed_x = (Math.random() * 5 + 5) * (this.x > window.innerWidth ? -1 : 1);
-                this.speed_y = -Math.random() * 10;
+                this.speed_x = (Math.random() * 3 + 3) * (this.x > window.innerWidth ? -1 : 1);
+                this.speed_y = -Math.random() * 5;
                 break;
             
         }
