@@ -1,7 +1,19 @@
 export class Asteroid {
+    x = null;
+    y = null;
+    speed_x = null;
+    speed_y = null;
+    width = null;
+    height = null;
+    angle = null;
+    angle_speed = null;
+    color = null;
+
     constructor() {
-        this.width = 50;
-        this.height = 50;
+        this.width = 100;
+        this.height = 100;
+        this.angle = 0;
+        this.angle_speed = Math.random() * 3 + 3;
         this.color = 'blue';
 
         // We set the coordinates and the speed of the asteroid depending on 
@@ -54,8 +66,14 @@ export class Asteroid {
         context.save();
 
         context.translate(this.x, this.y);
-        context.fillStyle = this.color;
-        context.fillRect(this.width / -2, this.height / -2, this.width, this.height)
+
+        // Draw asteroid image
+        const image = document.getElementById('asteroid');
+        context.rotate(this.angle * Math.PI / 180);
+        context.drawImage(image, this.width / -2, this.height / -2, this.width, this.height);
+
+        // Rotate asteroid image
+        this.angle += this.angle_speed;
         
         context.restore();
     }

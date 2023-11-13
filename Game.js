@@ -34,7 +34,7 @@ export class Game {
 
     start = () => {
         // Init player
-        this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, 50, 50, 'red');
+        this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, 100, 100, 'red');
 
         // Generate 10 asteroids on random positions outside of the canvas (100px outside)
         for (let i = 0; i < 10; i++) {
