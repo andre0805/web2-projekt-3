@@ -2,7 +2,7 @@
 This game was developed as a part of Third Project for [Advanced Web Development](https://www.fer.unizg.hr/en/course/awd) @ FER
 
 ### Hosted at:
-* [https://web2-projekt-2.onrender.com](https://web2-projekt-3-tvm3.onrender.com)
+* [https://web2-projekt-3-tvm3.onrender.com](https://web2-projekt-3-tvm3.onrender.com)
 
 ### Features:
 * Asteroids spawn randomly outside the canvas and fly in it
