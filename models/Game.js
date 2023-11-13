@@ -231,6 +231,7 @@ export class Game {
                 // Update best time
                 if (this.timeSinceLastCollision > this.bestTime) {
                     this.bestTime = this.timeSinceLastCollision;
+                    
                     // Save best time to local storage
                     localStorage.setItem('bestTime', this.bestTime);
                 }
