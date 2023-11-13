@@ -30,8 +30,8 @@ export class Star {
     update() {
         this.x += this.speed_x;
         this.y += this.speed_y;
-        this.speed_x *= 1.03;
-        this.speed_y *= 1.03;
+        this.speed_x *= 1.01;
+        this.speed_y *= 1.01;
     }
 
     draw(context) {
