@@ -3,6 +3,7 @@ import { Asteroid } from './Asteroid.js';
 import { Star } from './Star.js';
 import { Explosion } from './Explosion.js';
 
+const refreshInterval = 20;
 export class Game {
     canvas = null;
     context = null;
@@ -12,6 +13,9 @@ export class Game {
     asteroids = [];
     stars = [];
     explosions = [];
+
+    bestTime = 0;
+    timeSinceLastCollision = 0;
 
     pressedKeys = { 
         arrowUp: false, 
@@ -29,11 +33,14 @@ export class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
 
+        // Get best time from local storage
+        this.bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
+
         // Add canvas to document
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 
         this.frameNo = 0;
-        this.interval = setInterval(this.update, 20);
+        this.interval = setInterval(this.update, refreshInterval);
     }
 
     start = () => {
@@ -62,6 +69,7 @@ export class Game {
         this.resetPressedKeys();
     };
 
+
     update = () => {
         this.frameNo++;
 
@@ -82,15 +90,12 @@ export class Game {
         // Redraw game area
         this.draw();
 
-        // TODO: Check for collisions between player and asteroids
+        // Check for collisions between player and asteroids
         this.checkCollisions();
 
-        // TODO: Check for win/loss condition
+        // Update time since last collision
+        this.timeSinceLastCollision += refreshInterval;
     };
-    
-    clear = () => {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
 
     updatePlayer = () => {
         // Apply movement if arrow key is pressed
@@ -143,6 +148,12 @@ export class Game {
         });
     }
 
+   
+    clear = () => {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+
     draw = () => {
         // Draw stars
         this.stars.forEach(star => star.draw(this.context));
@@ -155,7 +166,47 @@ export class Game {
 
         // Draw explosions
         this.explosions.forEach(explosion => explosion.draw(this.context));
+
+        
+        
+        const bestTime = new Date(this.bestTime);
+        const bestTimeMinutes = bestTime.getMinutes() < 10 ? `0${bestTime.getMinutes()}` : bestTime.getMinutes();
+        const bestTimeSeconds = bestTime.getSeconds() < 10 ? `0${bestTime.getSeconds()}` : bestTime.getSeconds();
+        let bestTimeMilliseconds = bestTime.getMilliseconds() < 100 ? `0${bestTime.getMilliseconds()}` : bestTime.getMilliseconds();
+        bestTimeMilliseconds = bestTimeMilliseconds < 10 ? `0${bestTimeMilliseconds}` : bestTimeMilliseconds;
+        
+        const bestTimeText = `Best time: ${bestTimeMinutes}:${bestTimeSeconds}:${bestTimeMilliseconds}`;
+        const bestTimeTextWidth = this.context.measureText(bestTimeText).width;
+        const bestTimeTextHeight = this.context.measureText(bestTimeText).actualBoundingBoxAscent;
+        
+        
+        const timeSinceLastCollision = new Date(this.timeSinceLastCollision);
+        const timeSinceLastCollisionMinutes = timeSinceLastCollision.getMinutes() < 10 ? `0${timeSinceLastCollision.getMinutes()}` : timeSinceLastCollision.getMinutes();
+        const timeSinceLastCollisioneSeconds = timeSinceLastCollision.getSeconds() < 10 ? `0${timeSinceLastCollision.getSeconds()}` : timeSinceLastCollision.getSeconds();
+        let timeSinceLastCollisionMilliseconds = timeSinceLastCollision.getMilliseconds() < 100 ? `0${timeSinceLastCollision.getMilliseconds()}` : timeSinceLastCollision.getMilliseconds();
+        timeSinceLastCollisionMilliseconds = timeSinceLastCollisionMilliseconds < 10 ? `0${timeSinceLastCollisionMilliseconds}` : timeSinceLastCollisionMilliseconds;
+        
+        const timeSinceLastCollisionText = `Time: ${timeSinceLastCollisionMinutes}:${timeSinceLastCollisioneSeconds}:${timeSinceLastCollisionMilliseconds}`;
+        const timeSinceLastCollisionTextWidth = this.context.measureText(timeSinceLastCollisionText).width;
+        const timeSinceLastCollisionTextHeight = this.context.measureText(timeSinceLastCollisionText).actualBoundingBoxAscent;
+    
+        // Draw text background
+        this.context.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.context.fillRect(
+            this.canvas.width - Math.max(bestTimeTextWidth, timeSinceLastCollisionTextWidth) - 16 * 2,
+            16,
+            Math.max(bestTimeTextWidth, timeSinceLastCollisionTextWidth) + 16 * 2,
+            bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2
+        );
+        
+        // Draw best time and time since last collision
+        this.context.font = '30px Arial';
+        this.context.fillStyle = 'white';
+        this.context.fillText(bestTimeText, this.canvas.width - bestTimeTextWidth - 16, bestTimeTextHeight + 16);
+        this.context.fillText(timeSinceLastCollisionText, this.canvas.width - timeSinceLastCollisionTextWidth - 16, bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2);
+
     };
+
 
     checkCollisions = () => {
         this.asteroids.forEach(asteroid => {
@@ -176,6 +227,16 @@ export class Game {
                 const explosionCenterX = (this.player.x + asteroid.x) / 2;
                 const explosionCenterY = (this.player.y + asteroid.y) / 2;
                 this.explosions.push(new Explosion(explosionCenterX, explosionCenterY));
+
+                // Update best time
+                if (this.timeSinceLastCollision > this.bestTime) {
+                    this.bestTime = this.timeSinceLastCollision;
+                    // Save best time to local storage
+                    localStorage.setItem('bestTime', this.bestTime);
+                }
+
+                // Update time since last collision
+                this.timeSinceLastCollision = 0;
             }
         });
     };
