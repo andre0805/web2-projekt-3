@@ -66,6 +66,8 @@ export class Asteroid {
         context.save();
 
         context.translate(this.x, this.y);
+        context.shadowBlur = 8;
+        context.shadowColor = 'rgba(255, 255, 255, 0.5)';
 
         // Draw asteroid image
         const image = document.getElementById('asteroid');
