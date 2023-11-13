@@ -31,8 +31,8 @@ export class Game {
         this.context = this.canvas.getContext('2d');
         
         // Set canvas size to window size
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        this.canvas.width = window.innerWidth - 16;
+        this.canvas.height = window.innerHeight - 16;
 
         // Get best time from local storage
         this.bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
