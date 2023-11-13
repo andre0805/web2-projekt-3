@@ -191,12 +191,12 @@ export class Game {
         const timeSinceLastCollisionTextHeight = this.context.measureText(timeSinceLastCollisionText).actualBoundingBoxAscent;
     
         // Draw text background
-        this.context.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         this.context.fillRect(
             this.canvas.width - Math.max(bestTimeTextWidth, timeSinceLastCollisionTextWidth) - 16 * 2,
-            16,
+            0,
             Math.max(bestTimeTextWidth, timeSinceLastCollisionTextWidth) + 16 * 2,
-            bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2
+            bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 3
         );
         
         // Draw best time and time since last collision
