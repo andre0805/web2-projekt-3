@@ -1,6 +1,7 @@
 import { Player } from './Player.js';
 import { Asteroid } from './Asteroid.js';
 import { Star } from './Star.js';
+import { Explosion } from './Explosion.js';
 
 export class Game {
     canvas = null;
@@ -10,6 +11,7 @@ export class Game {
     player = null;
     asteroids = [];
     stars = [];
+    explosions = [];
 
     pressedKeys = { 
         arrowUp: false, 
@@ -74,6 +76,9 @@ export class Game {
         // Update stars positions
         this.updateStars();
 
+        // Update explosions
+        this.updateExplosions();
+
         // Redraw game area
         this.draw();
 
@@ -129,6 +134,15 @@ export class Game {
         }
     }
 
+    updateExplosions = () => {
+        this.explosions.forEach(explosion => explosion.update());
+
+        // Remove explosions that are finished
+        this.explosions = this.explosions.filter(explosion => {
+            return explosion.frame < 5;
+        });
+    }
+
     draw = () => {
         // Draw stars
         this.stars.forEach(star => star.draw(this.context));
@@ -138,6 +152,9 @@ export class Game {
         
         // Draw asteroids
         this.asteroids.forEach(asteroid => asteroid.draw(this.context));
+
+        // Draw explosions
+        this.explosions.forEach(explosion => explosion.draw(this.context));
     };
 
     checkCollisions = () => {
@@ -155,7 +172,10 @@ export class Game {
                         console.error(error);
                     });
 
-                // TODO: Show explosion animation
+                // Add explosion
+                const explosionCenterX = (this.player.x + asteroid.x) / 2;
+                const explosionCenterY = (this.player.y + asteroid.y) / 2;
+                this.explosions.push(new Explosion(explosionCenterX, explosionCenterY));
             }
         });
     };
