@@ -16,6 +16,7 @@ export class Game {
 
     bestTime = 0;
     timeSinceLastCollision = 0;
+    maxAsteroids = 10;
 
     pressedKeys = { 
         arrowUp: false, 
@@ -95,6 +96,11 @@ export class Game {
 
         // Update time since last collision
         this.timeSinceLastCollision += refreshInterval;
+
+        // Add 1 asteroid every 5 seconds until maxAsteroids is 20
+        if (this.frameNo % (5000 / refreshInterval) === 0) {
+            if (this.maxAsteroids < 20) this.maxAsteroids++;
+        }
     };
 
     updatePlayer = () => {
@@ -119,8 +125,8 @@ export class Game {
             return asteroid.x > -100 && asteroid.x < this.canvas.width + 100 && asteroid.y > -100 && asteroid.y < this.canvas.height + 100;
         });
 
-        // Add new asteroids if there are less than 10
-        while (this.asteroids.length < 10) {
+        // Add new asteroids if there are less than maxAsteroids
+        while (this.asteroids.length < this.maxAsteroids) {
             this.asteroids.push(new Asteroid());
         }
     };
