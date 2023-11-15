@@ -76,10 +76,39 @@ export class Game {
         document.removeEventListener('keydown', this.handleKeyDown);
         document.removeEventListener('keyup', this.handleKeyUp);
 
+        // Remove canvas elements
+        this.player = null;
+        this.asteroids = [];
+        this.stars = [];
+        this.explosions = [];
+
+        // Reset time variables
+        this.bestTime = 0;
+        this.timeSinceLastCollision = 0;
+
+        // Reset max asteroids and max asteroid speed factor
+        this.maxAsteroids = 15;
+        this.maxAsteroidSpeedFactor = 1;
+
+        // Reset pressed keys so that player doesn't move when game is stopped
+        this.resetPressedKeys();
+    }
+
+    pause = () => {
+        clearInterval(this.interval);
+
         // Reset pressed keys so that player doesn't move when game is stopped
         this.resetPressedKeys();
     };
 
+    resume = () => {
+        if (this.interval) clearInterval(this.interval);
+        this.interval = setInterval(this.update, refreshInterval);
+
+        // Add event listener for arrow keys
+        document.addEventListener('keydown', this.handleKeyDown);
+        document.addEventListener('keyup', this.handleKeyUp);
+    }
 
     update = () => {
         this.frameNo++;
@@ -178,6 +207,20 @@ export class Game {
         // Draw explosions
         this.explosions.forEach(explosion => explosion.draw(this.context));
 
+        // Draw best time and time since last collision text
+        this.drawTimeText();
+
+        // Draw pause/resume text
+        this.drawPauseResumeText();
+    };
+
+    drawTimeText = () => {
+        this.context.save();
+
+        // Text style for best time and time since last collision (we define it here so that measureText function works properly)
+        this.context.font = '24px Courier';
+        this.context.textAlign = 'right';
+        
         // Calculate time components for best time
         const bestTime = new Date(this.bestTime);
         const bestTimeMinutes = bestTime.getMinutes() < 10 ? `0${bestTime.getMinutes()}` : bestTime.getMinutes();
@@ -200,6 +243,7 @@ export class Game {
         const timeSinceLastCollisionTextWidth = this.context.measureText(timeSinceLastCollisionText).width;
         const timeSinceLastCollisionTextHeight = this.context.measureText(timeSinceLastCollisionText).actualBoundingBoxAscent;
     
+
         // Draw text background
         this.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         this.context.fillRect(
@@ -209,19 +253,61 @@ export class Game {
             bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 3
         );
         
-        // Draw best time and time since last collision
-        this.context.font = '30px Courier';
-        
         this.context.fillStyle = 'white';
-        this.context.fillText(bestTimeText, this.canvas.width - bestTimeTextWidth - 16, bestTimeTextHeight + 16);
+        
+        // Draw best time text
+        this.context.fillText(
+            bestTimeText,
+            this.canvas.width - 16,
+            bestTimeTextHeight + 16
+        );
         
         // If time since last collision is greater than best time, make it blink green every 0.5 seconds (30 frames for green, 30 frames for white color)
         const isNewBestTime = this.bestTime != 0 && this.timeSinceLastCollision > this.bestTime;
         const shouldBlink = isNewBestTime && this.frameNo % 60 < 30;
         this.context.fillStyle = shouldBlink ? 'rgba(40, 255, 40, 1)' : 'white';
-        this.context.fillText(timeSinceLastCollisionText, this.canvas.width - timeSinceLastCollisionTextWidth - 16, bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2);
+        
+        // Draw time since last collision text
+        this.context.fillText(
+            timeSinceLastCollisionText,
+            this.canvas.width - 16,
+            bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2
+        );
+
+        this.context.restore();
     };
 
+    drawPauseResumeText = () => {
+        this.context.save();
+
+        // Text style for pause/resume text (we define it here so that measureText function works properly)
+        this.context.font = '18px Courier New';
+        this.context.textAlign = 'center';
+        this.context.textBaseline = 'middle';
+
+        const text = 'Press P to pause. Press R to resume.';
+        const textWidth = this.context.measureText(text).width;
+        const textHeight = this.context.measureText(text).actualBoundingBoxAscent;
+
+        // Draw pause/resume text background
+        this.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.context.fillRect(
+            0,
+            this.canvas.height - textHeight - 16 * 2,
+            this.canvas.width,
+            textHeight + 16 * 2
+        );
+
+        // Draw pause/resume text
+        this.context.fillStyle = 'white';
+        this.context.fillText(
+            text,
+            this.canvas.width / 2,
+            this.canvas.height - textHeight / 2 - 16
+        );
+
+        this.context.restore();
+    };
 
     checkCollisions = () => {
         this.asteroids.forEach(asteroid => {
@@ -291,16 +377,26 @@ export class Game {
     handleKeyDown = (event) => {
         switch (event.key) {
             case "ArrowUp":
+                this.resume();
                 this.pressedKeys.arrowUp = true;
                 break;
             case "ArrowDown":
+                this.resume();
                 this.pressedKeys.arrowDown = true;
                 break;
             case "ArrowLeft":
+                this.resume();
                 this.pressedKeys.arrowLeft = true;
                 break;
             case "ArrowRight":
+                this.resume();
                 this.pressedKeys.arrowRight = true;
+                break;
+            case "p":
+                this.pause();
+                break;
+            case "r":
+                this.resume();
                 break;
             default:
                 // Ignore other keys
