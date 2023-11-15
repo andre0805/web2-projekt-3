@@ -17,6 +17,7 @@ export class Game {
     bestTime = 0;
     timeSinceLastCollision = 0;
     maxAsteroids = 10;
+    maxAsteroidSpeedFactor = 1;
 
     pressedKeys = { 
         arrowUp: false, 
@@ -50,7 +51,7 @@ export class Game {
 
         // Generate 10 asteroids on random positions outside of the canvas (100px outside)
         for (let i = 0; i < 10; i++) {
-            this.asteroids.push(new Asteroid());
+            this.asteroids.push(new Asteroid(this.maxAsteroidSpeedFactor));
         }
         
         // Generate 100 stars on random positions inside the canvas
@@ -123,12 +124,12 @@ export class Game {
 
         // Remove asteroids that are out of bounds
         this.asteroids = this.asteroids.filter(asteroid => {
-            return asteroid.x > -100 && asteroid.x < this.canvas.width + 100 && asteroid.y > -100 && asteroid.y < this.canvas.height + 100;
+            return !(asteroid.x < -100 || asteroid.x > this.canvas.width + 100 || asteroid.y < -100 || asteroid.y > this.canvas.height + 100);
         });
 
         // Add new asteroids if there are less than maxAsteroids
         while (this.asteroids.length < this.maxAsteroids) {
-            this.asteroids.push(new Asteroid());
+            this.asteroids.push(new Asteroid(this.maxAsteroidSpeedFactor));
         }
     };
 
@@ -174,8 +175,6 @@ export class Game {
         // Draw explosions
         this.explosions.forEach(explosion => explosion.draw(this.context));
 
-        
-        
         const bestTime = new Date(this.bestTime);
         const bestTimeMinutes = bestTime.getMinutes() < 10 ? `0${bestTime.getMinutes()}` : bestTime.getMinutes();
         const bestTimeSeconds = bestTime.getSeconds() < 10 ? `0${bestTime.getSeconds()}` : bestTime.getSeconds();
@@ -207,11 +206,13 @@ export class Game {
         );
         
         // Draw best time and time since last collision
-        this.context.font = '30px Arial';
+        this.context.font = '30px Courier';
+        
         this.context.fillStyle = 'white';
         this.context.fillText(bestTimeText, this.canvas.width - bestTimeTextWidth - 16, bestTimeTextHeight + 16);
+        
+        this.context.fillStyle = timeSinceLastCollision > this.bestTime && this.frameNo % 50 < 25 ? 'rgba(40, 255, 40, 1)' : 'white';
         this.context.fillText(timeSinceLastCollisionText, this.canvas.width - timeSinceLastCollisionTextWidth - 16, bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2);
-
     };
 
 
@@ -245,6 +246,12 @@ export class Game {
 
                 // Update time since last collision
                 this.timeSinceLastCollision = 0;
+
+                // Reset max asteroids
+                this.maxAsteroids = 10;
+
+                // Reset max asteroid speed factor
+                this.maxAsteroidSpeedFactor = 1;
             }
         });
     };

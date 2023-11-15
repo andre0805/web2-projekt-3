@@ -10,7 +10,7 @@ export class Asteroid {
     rotation_speed = null;
     image = null;
 
-    constructor() {
+    constructor(maxSpeedFactor) {
         this.width = 50;
         this.height = 50;
         this.color = 'grey';
@@ -28,32 +28,32 @@ export class Asteroid {
             case 0:
                 this.x = -100;
                 this.y = Math.random() * (window.innerHeight);
-                this.speed_x = Math.random() * 5;
-                this.speed_y = (Math.random() * 3 + 3) * (this.y > window.innerHeight / 2 ? -1 : 1);
+                this.speed_x = Math.random() * 5 * maxSpeedFactor;
+                this.speed_y = (Math.random() * 3) * maxSpeedFactor * (this.y > window.innerHeight / 2 ? -1 : 1);
                 break;
             
             // Asteroid comes from the top side
             case 1:
                 this.x = Math.random() * (window.innerWidth);
                 this.y = -100;
-                this.speed_x = (Math.random() * 3 + 3) * (this.x > window.innerWidth / 2 ? -1 : 1);
-                this.speed_y = Math.random() * 5;
+                this.speed_x = (Math.random() * 3) * maxSpeedFactor * (this.x > window.innerWidth / 2 ? -1 : 1);
+                this.speed_y = Math.random() * 5 * maxSpeedFactor;
                 break;
             
             // Asteroid comes from the right side
             case 2:
                 this.x = window.innerWidth + 100;
                 this.y = Math.random() * (window.innerHeight);
-                this.speed_x = -Math.random() * 5;
-                this.speed_y = (Math.random() * 3 + 3) * (this.y > window.innerHeight / 2 ? -1 : 1);
+                this.speed_x = -Math.random() * 5 * maxSpeedFactor;
+                this.speed_y = (Math.random() * 3) * maxSpeedFactor * (this.y > window.innerHeight / 2 ? -1 : 1);
                 break;
             
             // Asteroid comes from the bottom side
             case 3:
                 this.x = Math.random() * (window.innerWidth);
                 this.y = window.innerHeight + 100;
-                this.speed_x = (Math.random() * 3 + 3) * (this.x > window.innerWidth ? -1 : 1);
-                this.speed_y = -Math.random() * 5;
+                this.speed_x = (Math.random() * 3) * maxSpeedFactor * (this.x > window.innerWidth ? -1 : 1);
+                this.speed_y = -Math.random() * 5 * maxSpeedFactor;
                 break;
             
         }
