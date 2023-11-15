@@ -4,8 +4,8 @@ export class Player {
     speed = null;
     width = null;
     height = null;
-    angle = null;
     color = null;
+    angle = null;
     image = null;
 
     constructor(x, y, width, height, color) {
@@ -14,8 +14,12 @@ export class Player {
         this.speed = 8;
         this.width = width;
         this.height = height;
-        this.angle = 0;
         this.color = color;
+
+        // The player will be rotating as it moves
+        this.angle = 0;
+
+        // Load player image
         this.image = document.getElementById('player');
     }
 
@@ -38,7 +42,10 @@ export class Player {
     draw(context) {
         context.save();
 
+        // Move to player position
         context.translate(this.x, this.y);
+
+        // Set shadow
         context.shadowBlur = 8;
         context.shadowColor = 'rgba(255, 255, 255, 0.5)';
         

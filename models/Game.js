@@ -3,7 +3,8 @@ import { Asteroid } from './Asteroid.js';
 import { Star } from './Star.js';
 import { Explosion } from './Explosion.js';
 
-const refreshInterval = 20;
+// Refresh interval in milliseconds (60fps)
+const refreshInterval = 1000 / 60;
 export class Game {
     canvas = null;
     context = null;
@@ -14,11 +15,15 @@ export class Game {
     stars = [];
     explosions = [];
 
+    // Variables for tracking time
     bestTime = 0;
     timeSinceLastCollision = 0;
-    maxAsteroids = 10;
+
+    // Variables for tracking game difficulty
+    maxAsteroids = 15;
     maxAsteroidSpeedFactor = 1;
 
+    // Variables for tracking pressed keys (arrow keys for moving the player)
     pressedKeys = { 
         arrowUp: false, 
         arrowDown: false, 
@@ -31,7 +36,7 @@ export class Game {
         this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
         
-        // Set canvas size to window size
+        // Set canvas size to window size (with 16px margin)
         this.canvas.width = window.innerWidth - 16;
         this.canvas.height = window.innerHeight - 16;
 
@@ -49,9 +54,9 @@ export class Game {
         // Init player
         this.player = new Player(this.canvas.width / 2, this.canvas.height / 2, 50, 50, 'red');
 
-        // Generate 10 asteroids on random positions outside of the canvas (100px outside)
-        for (let i = 0; i < 10; i++) {
-            this.asteroids.push(new Asteroid(this.maxAsteroidSpeedFactor));
+        // Generate asteroids on random positions outside of the canvas (100px outside)
+        for (let i = 0; i < this.maxAsteroids; i++) {
+            this.asteroids.push(new Asteroid(this.canvas, this.maxAsteroidSpeedFactor));
         }
         
         // Generate 100 stars on random positions inside the canvas
@@ -66,8 +71,12 @@ export class Game {
 
     stop = () => {
         clearInterval(this.interval);
+
+        // Remove event listener for arrow keys
         document.removeEventListener('keydown', this.handleKeyDown);
         document.removeEventListener('keyup', this.handleKeyUp);
+
+        // Reset pressed keys so that player doesn't move when game is stopped
         this.resetPressedKeys();
     };
 
@@ -98,7 +107,7 @@ export class Game {
         // Update time since last collision
         this.timeSinceLastCollision += refreshInterval;
 
-        // Add 1 asteroid every 5 seconds until maxAsteroids is 20
+        // Add 1 asteroid every 5 seconds until maxAsteroids is 40, then add 0.1 to maxAsteroidSpeedFactor every 5 seconds until it is 3
         if (this.frameNo % (5000 / refreshInterval) === 0) {
             if (this.maxAsteroids < 40) this.maxAsteroids++;
             if (this.maxAsteroidSpeedFactor < 3) this.maxAsteroidSpeedFactor += 0.1;
@@ -123,13 +132,11 @@ export class Game {
         this.asteroids.forEach(asteroid => asteroid.update());
 
         // Remove asteroids that are out of bounds
-        this.asteroids = this.asteroids.filter(asteroid => {
-            return !(asteroid.x < -100 || asteroid.x > this.canvas.width + 100 || asteroid.y < -100 || asteroid.y > this.canvas.height + 100);
-        });
+        this.asteroids = this.asteroids.filter(asteroid => asteroid.x > -100 && asteroid.x < this.canvas.width + 100 && asteroid.y > -100 && asteroid.y < this.canvas.height + 100);
 
         // Add new asteroids if there are less than maxAsteroids
         while (this.asteroids.length < this.maxAsteroids) {
-            this.asteroids.push(new Asteroid(this.maxAsteroidSpeedFactor));
+            this.asteroids.push(new Asteroid(this.canvas, this.maxAsteroidSpeedFactor));
         }
     };
 
@@ -137,11 +144,9 @@ export class Game {
         this.stars.forEach(star => star.update());
 
         // Remove stars that are out of bounds
-        this.stars = this.stars.filter(star => {
-            return star.x > 0 && star.x < this.canvas.width && star.y > 0 && star.y < this.canvas.height;
-        });
+        this.stars = this.stars.filter(star => star.x > 0 && star.x < this.canvas.width && star.y > 0 && star.y < this.canvas.height);
 
-        // Add new stars every 10 frames
+        // Add new stars if there are less than 100
         while (this.stars.length < 100) {
             this.stars.push(new Star());
         }
@@ -151,9 +156,7 @@ export class Game {
         this.explosions.forEach(explosion => explosion.update());
 
         // Remove explosions that are finished
-        this.explosions = this.explosions.filter(explosion => {
-            return explosion.frame < 5;
-        });
+        this.explosions = this.explosions.filter(explosion => explosion.frame < 5);
     }
 
    
@@ -175,6 +178,7 @@ export class Game {
         // Draw explosions
         this.explosions.forEach(explosion => explosion.draw(this.context));
 
+        // Calculate time components for best time
         const bestTime = new Date(this.bestTime);
         const bestTimeMinutes = bestTime.getMinutes() < 10 ? `0${bestTime.getMinutes()}` : bestTime.getMinutes();
         const bestTimeSeconds = bestTime.getSeconds() < 10 ? `0${bestTime.getSeconds()}` : bestTime.getSeconds();
@@ -185,7 +189,7 @@ export class Game {
         const bestTimeTextWidth = this.context.measureText(bestTimeText).width;
         const bestTimeTextHeight = this.context.measureText(bestTimeText).actualBoundingBoxAscent;
         
-        
+        // Calculate time components for time since last collision
         const timeSinceLastCollision = new Date(this.timeSinceLastCollision);
         const timeSinceLastCollisionMinutes = timeSinceLastCollision.getMinutes() < 10 ? `0${timeSinceLastCollision.getMinutes()}` : timeSinceLastCollision.getMinutes();
         const timeSinceLastCollisioneSeconds = timeSinceLastCollision.getSeconds() < 10 ? `0${timeSinceLastCollision.getSeconds()}` : timeSinceLastCollision.getSeconds();
@@ -211,7 +215,10 @@ export class Game {
         this.context.fillStyle = 'white';
         this.context.fillText(bestTimeText, this.canvas.width - bestTimeTextWidth - 16, bestTimeTextHeight + 16);
         
-        this.context.fillStyle = timeSinceLastCollision > this.bestTime && this.frameNo % 50 < 25 ? 'rgba(40, 255, 40, 1)' : 'white';
+        // If time since last collision is greater than best time, make it blink green every 0.5 seconds (30 frames for green, 30 frames for white color)
+        const isNewBestTime = this.timeSinceLastCollision > this.bestTime;
+        const shouldBlink = isNewBestTime && this.frameNo % 60 < 30;
+        this.context.fillStyle = shouldBlink ? 'rgba(40, 255, 40, 1)' : 'white';
         this.context.fillText(timeSinceLastCollisionText, this.canvas.width - timeSinceLastCollisionTextWidth - 16, bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2);
     };
 
@@ -231,7 +238,7 @@ export class Game {
                         console.error(error);
                     });
 
-                // Add explosion
+                // Add explosion with center in the middle of the player and the asteroid
                 const explosionCenterX = (this.player.x + asteroid.x) / 2;
                 const explosionCenterY = (this.player.y + asteroid.y) / 2;
                 this.explosions.push(new Explosion(explosionCenterX, explosionCenterY));
@@ -247,10 +254,8 @@ export class Game {
                 // Update time since last collision
                 this.timeSinceLastCollision = 0;
 
-                // Reset max asteroids
+                // Reset max asteroids and max asteroid speed factor
                 this.maxAsteroids = 10;
-
-                // Reset max asteroid speed factor
                 this.maxAsteroidSpeedFactor = 1;
             }
         });
@@ -259,6 +264,7 @@ export class Game {
     checkCollision = (obj1, obj2) => {
         // Objects are colieded if obj1 center is inside obj2 bounds
 
+        // Calculate centers of objects
         const obj1CenterX = obj1.x + obj1.width / 2;
         const obj1CenterY = obj1.y + obj1.height / 2;
         const obj2CenterX = obj2.x + obj2.width / 2;
