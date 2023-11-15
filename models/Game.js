@@ -99,7 +99,8 @@ export class Game {
 
         // Add 1 asteroid every 5 seconds until maxAsteroids is 20
         if (this.frameNo % (5000 / refreshInterval) === 0) {
-            if (this.maxAsteroids < 20) this.maxAsteroids++;
+            if (this.maxAsteroids < 40) this.maxAsteroids++;
+            if (this.maxAsteroidSpeedFactor < 3) this.maxAsteroidSpeedFactor += 0.1;
         }
     };
 
