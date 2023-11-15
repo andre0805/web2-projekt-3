@@ -24,7 +24,7 @@ export class Star {
         this.size = Math.random() * 5;
 
         // Random gray color
-        const gray = Math.floor(Math.random() * (256 - 128) + 127);
+        const gray = Math.floor(Math.random() * (255 - 127) + 127);
         this.color = `rgb(${gray}, ${gray}, ${gray})`;
     }
 
