@@ -6,7 +6,6 @@ export class Star {
     size = null;
     color = null;
 
-
     constructor() {
         // The star will be moving from the center of the screen to the outside depending on 
         // the angle it has (in radians) and the radius of the circle it is moving on
