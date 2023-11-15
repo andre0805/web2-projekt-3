@@ -185,7 +185,7 @@ export class Game {
         let bestTimeMilliseconds = bestTime.getMilliseconds() < 100 ? `0${bestTime.getMilliseconds()}` : bestTime.getMilliseconds();
         bestTimeMilliseconds = bestTimeMilliseconds < 10 ? `0${bestTimeMilliseconds}` : bestTimeMilliseconds;
         
-        const bestTimeText = `Best time: ${bestTimeMinutes}:${bestTimeSeconds}:${bestTimeMilliseconds}`;
+        const bestTimeText = this.bestTime == 0 ? 'Best time: --:--:---' : `Best time: ${bestTimeMinutes}:${bestTimeSeconds}:${bestTimeMilliseconds}`;
         const bestTimeTextWidth = this.context.measureText(bestTimeText).width;
         const bestTimeTextHeight = this.context.measureText(bestTimeText).actualBoundingBoxAscent;
         
@@ -216,7 +216,7 @@ export class Game {
         this.context.fillText(bestTimeText, this.canvas.width - bestTimeTextWidth - 16, bestTimeTextHeight + 16);
         
         // If time since last collision is greater than best time, make it blink green every 0.5 seconds (30 frames for green, 30 frames for white color)
-        const isNewBestTime = this.timeSinceLastCollision > this.bestTime;
+        const isNewBestTime = this.bestTime != 0 && this.timeSinceLastCollision > this.bestTime;
         const shouldBlink = isNewBestTime && this.frameNo % 60 < 30;
         this.context.fillStyle = shouldBlink ? 'rgba(40, 255, 40, 1)' : 'white';
         this.context.fillText(timeSinceLastCollisionText, this.canvas.width - timeSinceLastCollisionTextWidth - 16, bestTimeTextHeight + timeSinceLastCollisionTextHeight + 16 * 2);
