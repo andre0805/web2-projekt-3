@@ -16,7 +16,7 @@ export class Player {
         this.height = height;
         this.angle = 0;
         this.color = color;
-        this.image = 'player';
+        this.image = document.getElementById('player');
     }
 
     moveDown() {
@@ -43,9 +43,8 @@ export class Player {
         context.shadowColor = 'rgba(255, 255, 255, 0.5)';
         
         // Draw player image
-        const image = document.getElementById(this.image);
         context.rotate(this.angle * Math.PI / 180);
-        context.drawImage(image, this.width / -2, this.height / -2, this.width, this.height);
+        context.drawImage(this.image, this.width / -2, this.height / -2, this.width, this.height);
         
         // Rotate player image
         this.angle += 5;
