@@ -23,8 +23,11 @@ window.onclick = () => {
     game.resume();
 }
 
-// Resize the canvas if the window is resized
 window.onresize = () => {
+    // Pause the game
+    game.pause();
+
+    // Resize the canvas
     game.canvas.width = window.innerWidth - 20;
     game.canvas.height = window.innerHeight - 20;
     
