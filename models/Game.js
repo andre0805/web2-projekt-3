@@ -99,6 +99,13 @@ export class Game {
 
         // Reset pressed keys so that player doesn't move when game is stopped
         this.resetPressedKeys();
+
+        // Darken game area
+        this.canvas.style.filter = 'brightness(0.5)';
+
+        // Show pause dialog
+        const dialog = document.getElementById('dialog');
+        dialog.show();
     };
 
     resume = () => {
@@ -108,6 +115,13 @@ export class Game {
         // Add event listener for arrow keys
         document.addEventListener('keydown', this.handleKeyDown);
         document.addEventListener('keyup', this.handleKeyUp);
+
+        // Lighten game area
+        this.canvas.style.filter = 'brightness(1)';
+
+        // Close pause dialog
+        const dialog = document.getElementById('dialog');
+        dialog.close();
     }
 
     update = () => {
@@ -210,8 +224,8 @@ export class Game {
         // Draw best time and time since last collision text
         this.drawTimeText();
 
-        // Draw pause/resume text
-        this.drawPauseResumeText();
+        // Draw pause text
+        this.drawPauseText();
     };
 
     drawTimeText = () => {
@@ -277,19 +291,19 @@ export class Game {
         this.context.restore();
     };
 
-    drawPauseResumeText = () => {
+    drawPauseText = () => {
         this.context.save();
 
-        // Text style for pause/resume text (we define it here so that measureText function works properly)
-        this.context.font = '18px Courier New';
+        // Text style for pause text (we define it here so that measureText function works properly)
+        this.context.font = '18px Courier';
         this.context.textAlign = 'center';
         this.context.textBaseline = 'middle';
 
-        const text = 'Press P to pause. Press R to resume.';
+        const text = 'Press P to pause';
         const textWidth = this.context.measureText(text).width;
         const textHeight = this.context.measureText(text).actualBoundingBoxAscent;
 
-        // Draw pause/resume text background
+        // Draw pause text background
         this.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
         this.context.fillRect(
             0,
@@ -298,7 +312,7 @@ export class Game {
             textHeight + 16 * 2
         );
 
-        // Draw pause/resume text
+        // Draw pause text
         this.context.fillStyle = 'white';
         this.context.fillText(
             text,
