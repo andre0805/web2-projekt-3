@@ -33,7 +33,7 @@ export class Game {
 
     constructor() {
         // Define canvas and context
-        this.canvas = document.createElement('canvas');
+        this.canvas = document.getElementById('game_area');
         this.context = this.canvas.getContext('2d');
         
         // Set canvas size to window size (with 16px margin)
